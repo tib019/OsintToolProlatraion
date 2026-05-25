@@ -14,8 +14,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from app.db.base import Base  # import all models so metadata is populated
-from app.db.session import get_db
+from app.core.database import Base, get_db  # noqa: F401 – ensures metadata is populated
+import app.models  # noqa: F401 – registers all ORM models with Base.metadata
 from app.main import app
 
 # ---------------------------------------------------------------------------

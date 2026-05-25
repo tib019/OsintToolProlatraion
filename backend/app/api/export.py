@@ -158,7 +158,7 @@ async def export_pdf(
     story = []
 
     # Title
-    story.append(Paragraph(f"PHANTOM — Case Report", styles["Title"]))
+    story.append(Paragraph("PHANTOM — Case Report", styles["Title"]))
     story.append(Spacer(1, 0.3 * cm))
     story.append(Paragraph(f"<b>Name:</b> {case.name}", styles["Normal"]))
     if case.description:
@@ -353,7 +353,7 @@ async def export_png(
     edges = state["edges"]
 
     try:
-        from PIL import Image, ImageDraw, ImageFont
+        from PIL import Image, ImageDraw
     except ImportError:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

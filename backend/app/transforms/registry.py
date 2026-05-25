@@ -64,7 +64,7 @@ class TransformRegistry:
         return [
             t
             for t in self._transforms.values()
-            if entity_type in t.input_entity_types
+            if entity_type in t.input_types
         ]
 
     def all_transforms(self) -> list["BaseTransform"]:

@@ -22,4 +22,4 @@ for cls in [
     GoogleDorkingTransform,
     SocialGraphExpansionTransform,
 ]:
-    registry.register(cls())
+    registry.register(cls())  # type: ignore[abstract]

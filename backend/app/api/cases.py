@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -71,7 +71,7 @@ async def update_case(
     return _build_case_response(case)
 
 
-@router.delete("/{case_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+@router.delete("/{case_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_case(
     case_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

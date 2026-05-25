@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -43,7 +43,7 @@ async def set_api_key(
     )
 
 
-@router.delete("/api-keys/{service_name}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+@router.delete("/api-keys/{service_name}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_api_key(
     service_name: str,
     db: AsyncSession = Depends(get_db),

@@ -4,8 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import String, Text, func
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import JSON, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -17,7 +16,7 @@ class Case(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    tags: Mapped[list[str]] = mapped_column(ARRAY(String), default=list, nullable=False, server_default="{}")
+    tags: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False, server_default="[]")
     notes_md: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(

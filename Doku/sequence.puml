@@ -1,0 +1,91 @@
+@startuml
+skinparam backgroundColor white
+
+actor "Ermittler" as user
+participant "GraphCanvas\n(Frontend)" as frontend
+participant "useWebSocket\n(Hook)" as ws
+participant "FastAPI\nBackend" as backend
+participant "Transform\nEngine" as engine
+participant "OSINT-API\n(extern)" as osint
+participant "PostgreSQL" as db
+participant "WebSocket\nManager" as wsmanager
+
+user -> frontend: Rechtsklick auf Node\n(z.B. PhoneNumber)
+activate frontend
+
+frontend -> frontend: Kontextmenü anzeigen\nmit verfügbaren Transforms
+
+user -> frontend: Transform auswählen\n(z.B. "PhoneInfoga")
+frontend -> backend: POST /api/transforms/run\n{entity_id, transform_name, case_id}
+activate backend
+
+backend -> backend: Entity-Typ validieren\nvs. Transform input_types
+
+alt Entity-Typ inkompatibel
+  backend --> frontend: HTTP 422 Unprocessable Entity
+  frontend --> user: Fehlermeldung anzeigen
+else Entity-Typ passt
+  backend -> db: Entity-Daten laden\n(SELECT graph_nodes WHERE id=?)
+  activate db
+  db --> backend: Entity-Objekt zurück
+  deactivate db
+
+  backend -> engine: execute(entity, api_keys)
+  activate engine
+  note right of engine
+    asyncio.wait_for(
+      transform.run(entity, keys),
+      timeout=transform.timeout
+    )
+  end note
+
+  engine -> osint: HTTP-Request an\nexterne OSINT-API
+  activate osint
+  osint --> engine: JSON-Antwort\nmit OSINT-Daten
+  deactivate osint
+
+  engine -> engine: Entities aus Response\nextrahieren und normalisieren
+
+  engine --> backend: TransformResult\n{entities, edges, metadata}
+  deactivate engine
+
+  backend -> db: Neue Nodes anlegen\n(INSERT INTO graph_nodes)
+  activate db
+  db --> backend: Neue Node-IDs
+  deactivate db
+
+  backend -> db: Edges anlegen\n(INSERT INTO graph_edges)
+  activate db
+  db --> backend: Edge-IDs
+  deactivate db
+
+  backend -> db: Audit-Log schreiben\n(INSERT INTO audit_logs)
+  activate db
+  db --> backend: OK
+  deactivate db
+
+  backend -> wsmanager: broadcast(case_id, event)
+  activate wsmanager
+  note right of wsmanager
+    {
+      "type": "nodes_added",
+      "payload": [NodeResponse, ...]
+    }
+  end note
+
+  wsmanager -> ws: WebSocket-Nachricht\nan alle Clients des Falls
+  activate ws
+  ws -> frontend: store.addNode(node)\nstore.addEdge(edge)
+  deactivate ws
+
+  frontend -> frontend: Cytoscape.js\nNode hinzufügen & layouten
+
+  frontend --> user: Neue Nodes erscheinen\nim Graph-Canvas
+  deactivate wsmanager
+
+  backend --> frontend: HTTP 202 Accepted\n{job_id}
+  deactivate backend
+  deactivate frontend
+end
+
+@enduml

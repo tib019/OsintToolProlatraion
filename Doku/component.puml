@@ -1,0 +1,154 @@
+@startuml
+skinparam backgroundColor white
+
+package "Browser (React + Vite)" {
+
+  package "PHANTOM Frontend" {
+
+    component [App.tsx\n(Layout)] as app
+
+    package "Komponenten" {
+      component [TopBar\n(Fallverwaltung)] as topbar
+      component [LeftSidebar\n(Fallliste / Suche)] as leftsidebar
+      component [GraphCanvas\n(Cytoscape.js)] as graphcanvas
+      component [RightSidebar\n(Node-Details / Transforms)] as rightsidebar
+      component [NodeContextMenu\n(Rechtsklick-Menü)] as contextmenu
+    }
+
+    package "State Management" {
+      component [Zustand Store\n(graphStore.ts)] as store
+    }
+
+    package "API Layer" {
+      component [cases.ts] as apicases
+      component [graph.ts] as apigraph
+      component [transforms.ts] as apitransforms
+      component [client.ts\n(axios)] as apiclient
+    }
+
+    package "Realtime" {
+      component [useWebSocket.ts\n(WebSocket Hook)] as wshook
+    }
+
+    app --> topbar
+    app --> leftsidebar
+    app --> graphcanvas
+    app --> rightsidebar
+
+    graphcanvas ..> contextmenu : öffnet bei\nRechtsklick
+    graphcanvas --> store : liest Nodes/Edges
+    topbar --> store : aktualisiert activeCase
+    leftsidebar --> apicases
+    rightsidebar --> apitransforms
+
+    apicases --> apiclient
+    apigraph --> apiclient
+    apitransforms --> apiclient
+
+    wshook --> store : addNode / addEdge
+  }
+}
+
+cloud "Docker Network (phantom-net)" {
+
+  package "Backend (FastAPI + Python)" {
+
+    component [main.py\n(ASGI App)] as main
+
+    package "API Router" {
+      component [/api/cases] as rcases
+      component [/api/graph] as rgraph
+      component [/api/transforms] as rtransforms
+      component [/api/settings] as rsettings
+      component [/api/export] as rexport
+      component [/ws/{case_id}] as rws
+    }
+
+    package "Services" {
+      component [case_service.py] as scase
+      component [graph_service.py] as sgraph
+      component [settings_service.py] as ssettings
+    }
+
+    package "Transforms Engine" {
+      component [BaseTransform\n(ABC)] as base
+      component [PhoneInfoga] as t1
+      component [PlatformChecker] as t2
+      component [CnamLookup] as t3
+      component [LeakCheck] as t4
+      component [UsernameSearch] as t5
+      component [EmailOSINT] as t6
+      component [IPDomainIntel] as t7
+      component [GoogleDorking] as t8
+      component [SocialGraph] as t9
+    }
+
+    component [WebSocketManager\n(Broadcasts)] as wsmanager
+    component [Encryption\n(Fernet)] as enc
+
+    main --> rcases
+    main --> rgraph
+    main --> rtransforms
+    main --> rsettings
+    main --> rexport
+    main --> rws
+
+    rcases --> scase
+    rgraph --> sgraph
+    rtransforms --> wsmanager
+
+    t1 --|> base
+    t2 --|> base
+    t3 --|> base
+    t4 --|> base
+    t5 --|> base
+    t6 --|> base
+    t7 --|> base
+    t8 --|> base
+    t9 --|> base
+
+    rsettings --> enc
+  }
+
+  database "PostgreSQL 16" as pg {
+    component [cases] as tbl1
+    component [graph_nodes] as tbl2
+    component [graph_edges] as tbl3
+    component [audit_logs] as tbl4
+    component [api_keys] as tbl5
+  }
+
+  database "Redis 7" as redis {
+    component [Job Status Cache] as jobcache
+    component [Session Store] as sessions
+  }
+}
+
+cloud "Externe OSINT-Dienste" {
+  component [Numverify API] as ext1
+  component [HaveIBeenPwned API] as ext2
+  component [Shodan API] as ext3
+  component [OpenCNAM API] as ext4
+  component [ipapi.co] as ext5
+  component [GitHub API] as ext6
+  component [DuckDuckGo Search] as ext7
+}
+
+apiclient --> main : HTTPS REST
+wshook --> rws : WebSocket ws://
+
+scase --> pg
+sgraph --> pg
+ssettings --> pg
+
+rtransforms --> redis : Job-Status speichern
+
+t1 --> ext1
+t4 --> ext2
+t7 --> ext3
+t3 --> ext4
+t7 --> ext5
+t9 --> ext6
+t8 --> ext7
+
+@enduml

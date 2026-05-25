@@ -12,41 +12,46 @@ export type EntityType =
 
 export interface GraphNode {
   id: string
-  type: EntityType
+  entity_type: EntityType
   value: string
   label: string
   properties: Record<string, unknown>
-  position?: { x: number; y: number }
+  pos_x?: number
+  pos_y?: number
+  created_at: string
 }
 
 export interface GraphEdge {
   id: string
-  source: string
-  target: string
+  case_id: string
+  source_id: string
+  target_id: string
   label: string
-  transform: string
+  transform_name: string
+  created_at: string
 }
 
 export interface Case {
   id: string
   name: string
-  description: string
+  description?: string
   tags: string[]
-  createdAt: string
-  updatedAt: string
+  notes_md?: string
+  node_count: number
+  created_at: string
+  updated_at: string
 }
 
-export interface Transform {
-  id: string
+export interface TransformInfo {
   name: string
   description: string
-  inputTypes: EntityType[]
-  outputTypes: EntityType[]
+  input_types: string[]
+  output_types: string[]
+  timeout: number
+  rate_limit: number
 }
 
-export interface TransformResult {
-  entities: GraphNode[]
-  edges: GraphEdge[]
-  error?: string
-  durationMs: number
+export interface WsEvent {
+  type: string
+  payload: unknown
 }

@@ -1,72 +1,82 @@
-import React from 'react'
+import { useEffect, useRef } from 'react'
+import { GraphCanvas } from './components/Graph/GraphCanvas'
+import type { GraphCanvasHandle } from './components/Graph/GraphCanvas'
+import { LeftSidebar } from './components/Sidebar/LeftSidebar'
+import { RightSidebar } from './components/Sidebar/RightSidebar'
+import { NodeContextMenu } from './components/ContextMenu/NodeContextMenu'
+import { TopBar } from './components/TopBar/TopBar'
+import { useGraphStore } from './stores/graphStore'
+import { useWebSocket } from './hooks/useWebSocket'
+import { casesApi } from './api/cases'
 
 function App() {
+  const { activeCase, setCases, setActiveCase, setNodes, setEdges } = useGraphStore()
+  const canvasRef = useRef<GraphCanvasHandle>(null)
+
+  // Load cases on mount
+  useEffect(() => {
+    casesApi.list().then(setCases).catch(() => {})
+  }, [setCases])
+
+  // WebSocket connection for the active case
+  useWebSocket(activeCase?.id ?? null)
+
+  async function handleCaseSelect(id: string) {
+    try {
+      const [caseData, graph] = await Promise.all([
+        casesApi.get(id),
+        casesApi.getGraph(id),
+      ])
+      setActiveCase(caseData)
+      setNodes(graph.nodes)
+      setEdges(graph.edges)
+    } catch {
+      // handle API errors gracefully — case may still load partially
+    }
+  }
+
+  function handleLayoutChange(layout: string) {
+    canvasRef.current?.runLayout(layout)
+  }
+
+  function handleExport() {
+    // Export graph as PNG via Cytoscape's built-in PNG export
+    // Stubbed — full implementation would call cy.png() from the canvas
+    console.info('Export triggered')
+  }
+
   return (
-    <div className="min-h-screen bg-phantom-bg text-gray-200 font-mono flex flex-col">
-      {/* Header */}
-      <header className="border-b border-phantom-border bg-phantom-surface px-6 py-4 flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-phantom-accent animate-pulse" />
-        <h1 className="text-phantom-accent font-bold tracking-widest text-lg uppercase">
-          PHANTOM
-        </h1>
-        <span className="text-phantom-muted text-sm">— OSINT Platform</span>
-      </header>
+    <div className="h-screen w-screen bg-phantom-bg flex flex-col overflow-hidden">
+      <TopBar onLayoutChange={handleLayoutChange} onExport={handleExport} />
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col items-center justify-center gap-8 p-8">
-        {/* Graph canvas placeholder */}
-        <div className="w-full max-w-4xl aspect-video bg-phantom-panel border border-phantom-border rounded-lg flex flex-col items-center justify-center gap-4 relative overflow-hidden">
-          {/* Grid lines decoration */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage:
-                'linear-gradient(#f59e0b 1px, transparent 1px), linear-gradient(90deg, #f59e0b 1px, transparent 1px)',
-              backgroundSize: '40px 40px',
-            }}
-          />
+      <div className="flex flex-1 overflow-hidden">
+        <LeftSidebar onCaseSelect={(id) => void handleCaseSelect(id)} />
 
-          {/* Placeholder node dots */}
-          <div className="absolute top-1/3 left-1/4 w-3 h-3 rounded-full bg-entity-person opacity-60" />
-          <div className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-entity-email opacity-60" />
-          <div className="absolute top-2/3 left-2/3 w-3 h-3 rounded-full bg-entity-phone opacity-60" />
-          <div className="absolute top-1/4 left-3/5 w-3 h-3 rounded-full bg-entity-username opacity-60" />
+        <main className="flex-1 relative overflow-hidden">
+          {activeCase ? (
+            <GraphCanvas ref={canvasRef} caseId={activeCase.id} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center font-mono">
+              <div className="text-center select-none">
+                <div className="text-phantom-accent text-4xl font-bold tracking-widest mb-4">
+                  PHANTOM
+                </div>
+                <div className="text-gray-500 text-sm mb-2">
+                  Open-source OSINT investigation platform
+                </div>
+                <div className="text-gray-600 text-xs">
+                  Select or create a case in the left panel to begin
+                </div>
+              </div>
+            </div>
+          )}
 
-          <div className="relative z-10 text-center">
-            <p className="text-phantom-muted text-sm uppercase tracking-widest mb-2">
-              Graph Canvas
-            </p>
-            <p className="text-phantom-accent font-bold text-xl tracking-wider">
-              Coming in Phase 3
-            </p>
-            <p className="text-phantom-muted text-xs mt-2">
-              Entity relationship graph will render here
-            </p>
-          </div>
-        </div>
+          {/* Context menu rendered on top of the graph canvas */}
+          <NodeContextMenu />
+        </main>
 
-        {/* Status bar */}
-        <div className="flex items-center gap-6 text-xs text-phantom-muted">
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-phantom-success" />
-            Backend connected
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-phantom-accent" />
-            Phase 2 — API layer
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-phantom-muted" />
-            Graph UI pending
-          </span>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-phantom-border bg-phantom-surface px-6 py-3 text-phantom-muted text-xs flex justify-between">
-        <span>PHANTOM OSINT Platform</span>
-        <span>v0.1.0-alpha</span>
-      </footer>
+        <RightSidebar />
+      </div>
     </div>
   )
 }

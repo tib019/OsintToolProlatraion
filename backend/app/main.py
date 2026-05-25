@@ -4,7 +4,9 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.api import cases, graph, transforms, export, settings as settings_router
+from app.api import cases, graph, transforms, export
+from app.api import settings as settings_router
+from app.api import websocket as websocket_router
 
 
 @asynccontextmanager
@@ -33,6 +35,7 @@ app.include_router(graph.router, prefix="/api/graph", tags=["graph"])
 app.include_router(transforms.router, prefix="/api/transforms", tags=["transforms"])
 app.include_router(export.router, prefix="/api/export", tags=["export"])
 app.include_router(settings_router.router, prefix="/api/settings", tags=["settings"])
+app.include_router(websocket_router.router, tags=["websocket"])
 
 
 @app.get("/health")

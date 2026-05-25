@@ -1,0 +1,82 @@
+@startuml
+skinparam backgroundColor white
+skinparam actorStyle awesome
+
+left to right direction
+
+actor "OSINT-Ermittler" as user
+actor "OSINT-API\n(extern)" as osintapi
+actor "PostgreSQL\nDatenbank" as db
+
+rectangle "PHANTOM OSINT Platform" {
+
+  usecase "Fall anlegen" as UC1
+  usecase "Fall bearbeiten" as UC2
+  usecase "Fall löschen" as UC3
+  usecase "Graph anzeigen" as UC4
+
+  usecase "Node hinzufügen" as UC5
+  usecase "Node entfernen" as UC6
+  usecase "Node-Position\nspeichern" as UC7
+
+  usecase "Transform ausführen" as UC8
+  usecase "Entity-Typ prüfen" as UC9
+  usecase "OSINT-Daten abrufen" as UC10
+  usecase "Neue Nodes\nspeichern" as UC11
+  usecase "Ergebnis via\nWebSocket senden" as UC12
+
+  usecase "Audit-Log anzeigen" as UC13
+
+  usecase "Graph exportieren\n(JSON / CSV / PNG)" as UC14
+
+  usecase "API-Schlüssel\nverwalten" as UC15
+  usecase "API-Schlüssel\nverschlüsseln" as UC16
+
+}
+
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
+user --> UC6
+user --> UC8
+user --> UC13
+user --> UC14
+user --> UC15
+
+UC8 ..> UC9 : <<include>>
+UC8 ..> UC10 : <<include>>
+UC8 ..> UC11 : <<include>>
+UC8 ..> UC12 : <<include>>
+
+UC5 ..> UC7 : <<extend>>
+
+UC15 ..> UC16 : <<include>>
+
+UC10 --> osintapi
+UC1 --> db
+UC2 --> db
+UC5 --> db
+UC6 --> db
+UC11 --> db
+UC13 --> db
+
+note right of UC10
+  Unterstützte Dienste:
+  - Numverify (Telefon)
+  - HaveIBeenPwned (Leaks)
+  - Shodan (IP/Domain)
+  - OpenCNAM (CNAM)
+  - ipapi.co (Geo)
+  - GitHub (Social)
+  - DuckDuckGo (Dorking)
+end note
+
+note bottom of UC16
+  Fernet-Verschlüsselung
+  mit SHA-256-Schlüssel
+  aus APP_SECRET_KEY
+end note
+
+@enduml

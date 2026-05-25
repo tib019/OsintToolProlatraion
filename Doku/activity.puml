@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+
+start
+
+:Ermittler öffnet PHANTOM\nim Browser;
+
+:Fall auswählen oder\nneuen Fall anlegen;
+
+if (Fall vorhanden?) then (nein)
+  :Fallname und Beschreibung eingeben;
+  :Fall in Datenbank anlegen\n(POST /api/cases);
+else (ja)
+  :Bestehenden Fall laden\n(GET /api/cases/{id}/graph);
+endif
+
+:Graph-Canvas wird angezeigt\n(Cytoscape.js);
+
+:Ermittler klickt mit\nrechter Maustaste auf Node;
+
+:Kontextmenü öffnet sich\nmit verfügbaren Transforms;
+
+:Ermittler wählt\nTransform aus;
+
+:POST /api/transforms/run\nwird gesendet\n(entity_id, transform_name);
+
+:Backend validiert\nEntity-Typ und Transform;
+
+if (Transform für\nEntity-Typ gültig?) then (nein)
+  :Fehlermeldung anzeigen\n"Transform nicht kompatibel";
+  stop
+else (ja)
+  :Transform-Job wird erstellt\n(Background Task);
+
+  fork
+    :Transform ausführen\n(async mit Timeout);
+  fork again
+    :Frontend empfängt\nWebSocket-Verbindung;
+  end fork
+
+  :OSINT-API aufrufen\n(extern / lokal);
+
+  if (API-Antwort\nerhalten?) then (nein)
+    :Timeout oder Fehler\naufzeichnen;
+
+    :WebSocket-Event senden\n{type: "transform_error"};
+
+    :Fehler im Frontend\nanzeigen;
+    stop
+  else (ja)
+    :Neue Entities extrahieren\nund normalisieren;
+
+    :Nodes und Edges in\nPostgreSQL speichern;
+
+    :Audit-Log-Eintrag\nerstellen;
+
+    :WebSocket-Event senden\n{type: "nodes_added",\n"edges_added"};
+
+    :Frontend empfängt Event\nund aktualisiert Graph;
+
+    :Neue Nodes werden\nim Canvas gerendert\n(Cytoscape.js);
+
+    :Ermittler kann neue\nNodes weiter untersuchen;
+  endif
+endif
+
+stop
+
+@enduml

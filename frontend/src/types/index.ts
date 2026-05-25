@@ -55,3 +55,24 @@ export interface WsEvent {
   type: string
   payload: unknown
 }
+
+export interface AuditLog {
+  id: string
+  event_type: string
+  entity_type?: string
+  entity_value?: string
+  transform_name?: string
+  metadata: Record<string, unknown>
+  created_at: string
+}
+
+export interface ApiKeyInfo {
+  service_name: string
+  is_active: boolean
+  is_set: boolean
+}
+
+export interface ModuleState {
+  name: string
+  enabled: boolean
+}

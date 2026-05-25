@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useGraphStore } from '../stores/graphStore'
-import type { GraphNode, GraphEdge, WsEvent } from '../types'
+import type { GraphNode, GraphEdge, AuditLog, WsEvent } from '../types'
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
 
@@ -8,7 +8,7 @@ export function useWebSocket(caseId: string | null) {
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimeout = useRef<number>()
   const reconnectDelay = useRef(1000)
-  const { addNode, addEdge } = useGraphStore()
+  const { addNode, addEdge, removeNode, addAuditLog } = useGraphStore()
 
   const connect = useCallback(() => {
     if (!caseId) return
@@ -22,8 +22,35 @@ export function useWebSocket(caseId: string | null) {
     ws.onmessage = (e) => {
       try {
         const event: WsEvent = JSON.parse(e.data as string)
-        if (event.type === 'NODE_ADDED') addNode(event.payload as GraphNode)
-        if (event.type === 'EDGE_ADDED') addEdge(event.payload as GraphEdge)
+        switch (event.type) {
+          case 'node_added':
+            addNode(event.payload as GraphNode)
+            break
+          case 'edge_added':
+            addEdge(event.payload as GraphEdge)
+            break
+          case 'node_removed': {
+            const p = event.payload as { node_id: string }
+            removeNode(p.node_id)
+            break
+          }
+          case 'node_moved': {
+            const p = event.payload as { node_id: string; x: number; y: number }
+            addNode({ ...useGraphStore.getState().nodes.find(n => n.id === p.node_id)!, pos_x: p.x, pos_y: p.y })
+            break
+          }
+          case 'transform_completed':
+          case 'transform_failed': {
+            const p = event.payload as Record<string, unknown>
+            addAuditLog({
+              id: crypto.randomUUID(),
+              event_type: event.type,
+              metadata: p,
+              created_at: new Date().toISOString(),
+            } as AuditLog)
+            break
+          }
+        }
       } catch {
         // ignore parse errors
       }
@@ -35,7 +62,7 @@ export function useWebSocket(caseId: string | null) {
         connect()
       }, reconnectDelay.current)
     }
-  }, [caseId, addNode, addEdge])
+  }, [caseId, addNode, addEdge, removeNode, addAuditLog])
 
   useEffect(() => {
     connect()

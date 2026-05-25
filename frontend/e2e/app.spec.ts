@@ -70,3 +70,39 @@ test('no cases shows empty state message', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText('No cases yet')).toBeVisible()
 })
+
+test('timeline panel is visible', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('span').filter({ hasText: 'TIMELINE' })).toBeVisible()
+})
+
+test('timeline collapses and expands', async ({ page }) => {
+  await page.goto('/')
+  const header = page.locator('span').filter({ hasText: 'TIMELINE' })
+  await expect(page.getByText('Open a case to see discovery timeline')).toBeVisible()
+  await header.click()
+  await expect(page.getByText('Open a case to see discovery timeline')).not.toBeVisible()
+  await header.click()
+  await expect(page.getByText('Open a case to see discovery timeline')).toBeVisible()
+})
+
+test('settings button opens settings panel', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTitle('Settings').click()
+  await expect(page.getByText('SETTINGS')).toBeVisible()
+  await expect(page.getByText('API Keys')).toBeVisible()
+  await expect(page.getByText('Modules')).toBeVisible()
+})
+
+test('settings panel closes on X', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTitle('Settings').click()
+  await expect(page.getByText('SETTINGS')).toBeVisible()
+  await page.getByRole('button', { name: '✕' }).click()
+  await expect(page.getByText('SETTINGS')).not.toBeVisible()
+})
+
+test('export button is disabled without active case', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('button', { name: '↓ Export' })).toBeDisabled()
+})

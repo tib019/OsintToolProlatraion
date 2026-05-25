@@ -11,18 +11,19 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "cytoscape": "^3.29.2",
-    "zustand": "^4.5.2",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.395.0"
+    "cytoscape": "^3.29.2",
+    "lucide-react": "^0.395.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/cytoscape": "^3.21.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@types/cytoscape": "^3.21.4",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
     "@vitejs/plugin-react": "^4.3.1",

@@ -16,7 +16,7 @@ export function NodeContextMenu() {
       .forEntity(node.entity_type)
       .then(setTransforms)
       .catch(() => setTransforms([]))
-  }, [node?.entity_type, node?.id])
+  }, [node])
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {

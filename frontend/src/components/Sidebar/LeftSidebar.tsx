@@ -19,7 +19,7 @@ const ENTITY_TYPES: EntityType[] = [
 ]
 
 export function LeftSidebar({ onCaseSelect }: { onCaseSelect: (id: string) => void }) {
-  const { cases, activeCase, setCases, setActiveCase } = useGraphStore()
+  const { cases, activeCase, setCases } = useGraphStore()
   const [collapsed, setCollapsed] = useState(false)
   const [newCaseName, setNewCaseName] = useState('')
   const [showNewCase, setShowNewCase] = useState(false)

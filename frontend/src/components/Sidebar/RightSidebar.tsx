@@ -20,7 +20,7 @@ export function RightSidebar() {
       .forEntity(selectedNode.entity_type)
       .then(setTransforms)
       .catch(() => setTransforms([]))
-  }, [selectedNode?.entity_type, selectedNode?.id])
+  }, [selectedNode])
 
   async function runTransform(name: string) {
     if (!activeCase || !selectedNodeId) return

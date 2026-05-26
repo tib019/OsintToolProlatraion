@@ -1,6 +1,6 @@
 # PHANTOM — OSINT Investigation Platform
 
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha-red?style=for-the-badge)](https://github.com/tib019/phantom-osint-platform)
+[![Version](https://img.shields.io/badge/version-1.0.0-brightgreen?style=for-the-badge)](https://github.com/tib019/phantom-osint-platform)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -234,15 +234,15 @@ See [GitHub Issues](https://github.com/tib019/phantom-osint-platform/issues) and
 
 | Phase | Status | Target |
 |-------|--------|--------|
-| Phase 1: Infrastructure & Scaffold | 🟡 In Progress | v0.1.0 |
-| Phase 2: Backend Core | ⚪ Planned | v0.2.0 |
-| Phase 3: Frontend Core | ⚪ Planned | v0.3.0 |
-| Phase 4: Integration | ⚪ Planned | v0.4.0 |
-| Phase 5: OSINT Transforms | ⚪ Planned | v0.5.0 |
-| Phase 6: Case Management | ⚪ Planned | v0.6.0 |
-| Phase 7: Timeline & Export | ⚪ Planned | v0.7.0 |
-| Phase 8: Settings & API Mgmt | ⚪ Planned | v0.8.0 |
-| Phase 9: Testing & Docs | ⚪ Planned | v1.0.0 |
+| Phase 1: Infrastructure & Scaffold | ✅ Complete | v0.1.0 |
+| Phase 2: Backend Core | ✅ Complete | v0.2.0 |
+| Phase 3: Frontend Core | ✅ Complete | v0.3.0 |
+| Phase 4: Integration | ✅ Complete | v0.4.0 |
+| Phase 5: OSINT Transforms | ✅ Complete | v0.5.0 |
+| Phase 6: Case Management | ✅ Complete | v0.6.0 |
+| Phase 7: Timeline & Export | ✅ Complete | v0.7.0 |
+| Phase 8: Settings & API Mgmt | ✅ Complete | v0.8.0 |
+| Phase 9: Testing & Docs | ✅ Complete | v1.0.0 |
 
 ---
 

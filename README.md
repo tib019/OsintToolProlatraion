@@ -30,6 +30,7 @@
 | [Pflichtenheft](docs/Pflichtenheft.md) | Technische Spezifikation, Datenbankschema, API-Spec, Architektur |
 | [MoSCoW-Analyse](docs/MoSCoW.md) | Must/Should/Could/Won't Have — Prioritätsbewertung |
 | [Projektherleitung](docs/Projektherleitung.md) | Problemstellung, Lösungsansatz, Technische Entscheidungen |
+| [UML-Dokumentation](docs/UML.md) | 12 Diagramme: Use-Case, Klassen, ERD, Komponenten, Sequenz, Aktivität, Zustand |
 
 ---
 

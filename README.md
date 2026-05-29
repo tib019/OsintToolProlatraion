@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
-[![Tests](https://img.shields.io/badge/Tests-60%20passing-brightgreen?style=for-the-badge)](#)
+[![Tests](https://img.shields.io/badge/Tests-126%20passing-brightgreen?style=for-the-badge)](#)
 [![License](https://img.shields.io/badge/License-Private-gray?style=for-the-badge)](LICENSE)
 
 > **PHANTOM** is a self-hosted, full-stack OSINT investigation platform combining Maltego-style graph investigation with automated phone, email, IP/domain and username OSINT. Built for investigators, security researchers, and OSINT analysts.
@@ -182,10 +182,10 @@ make reset    # Datenbank zurücksetzen
 ## Tests
 
 ```
-Backend:  48 Tests (API-Integration + Transform-Unit-Tests mit HTTP-Mocking)
-Frontend: 12 Playwright E2E-Tests (Chromium, API-gemockt)
+Backend:   99 Tests (API-Integration + Transform-Unit-Tests mit HTTP-Mocking)
+Frontend:  27 Playwright E2E-Tests (Chromium, API-gemockt)
 ──────────────────────────────────────────────────────
-Gesamt:   60 Tests
+Gesamt:   126 Tests
 ```
 
 ```bash

@@ -236,3 +236,10 @@ cd frontend && npx playwright test
 ## Lizenz
 
 Privates Projekt. Alle Rechte vorbehalten.
+
+---
+
+## Teil des PROLETARIA Konglomerats
+
+Der OSINT Tool ist ein Modul des [PROLETARIA](https://github.com/tib019/PROLETARIA) Konglomerats —
+dem Anti-Palantir Dach-Repository das alle Module verbindet.

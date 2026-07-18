@@ -24,7 +24,7 @@ async def test_list_transforms_returns_list(client: AsyncClient):
     assert r.status_code == 200
     transforms = r.json()
     assert isinstance(transforms, list)
-    assert len(transforms) == 10
+    assert len(transforms) == 11
 
 
 async def test_list_transforms_fields(client: AsyncClient):

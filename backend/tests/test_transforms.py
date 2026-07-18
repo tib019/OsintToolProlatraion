@@ -12,6 +12,7 @@ from app.transforms.phone.platform_checker import PlatformRegistrationTransform
 from app.transforms.phone.cnam_lookup import CNAMLookupTransform
 from app.transforms.phone.leak_check import LeakCheckTransform
 from app.transforms.phone.social_linker import SocialProfileLinkerTransform
+from app.transforms.phone.email_correlation import PhoneEmailCorrelationTransform
 
 VALID_PHONE = "+4915123456789"
 VALID_EMAIL = "victim@example.com"
@@ -347,4 +348,54 @@ async def test_registry_has_all_phone_transforms():
 async def test_registry_total_count():
     import app.transforms  # noqa: F401
     from app.transforms.registry import registry
-    assert len(registry) == 10
+    assert len(registry) == 11
+
+
+# ---------------------------------------------------------------------------
+# Phone → Email Correlation
+# ---------------------------------------------------------------------------
+
+class TestPhoneEmailCorrelationTransform:
+    transform = PhoneEmailCorrelationTransform()
+
+    async def test_missing_credentials_returns_info(self):
+        entity = Entity(type=EntityType.PHONE_NUMBER, value=VALID_PHONE)
+        result = await self.transform.execute(entity, {})
+        assert result.error is None
+        assert not result.entities
+        assert "info" in result.metadata
+
+    @respx.mock
+    async def test_emails_correlated_from_breach(self):
+        respx.get("https://api.dehashed.com/search").mock(
+            return_value=httpx.Response(200, json={"entries": [
+                {"email": "owner@example.com", "phone": "4915123456789",
+                 "database_name": "Collection1"},
+                {"email": "Owner@example.com", "phone": "4915123456789",
+                 "database_name": "LinkedIn"},
+                {"email": "", "phone": "4915123456789", "database_name": "NoEmail"},
+            ]})
+        )
+        entity = Entity(type=EntityType.PHONE_NUMBER, value=VALID_PHONE)
+        result = await self.transform.execute(
+            entity, {"DEHASHED_EMAIL": "me@x.com", "DEHASHED_API_KEY": "k"}
+        )
+        assert result.error is None
+        emails = [e for e in result.entities if e.type == EntityType.EMAIL_ADDRESS]
+        # Case-insensitive dedupe -> single email, both breach sources retained.
+        assert len(emails) == 1
+        assert emails[0].value == "owner@example.com"
+        assert set(emails[0].properties["breach_sources"]) == {"Collection1", "LinkedIn"}
+        assert result.metadata["correlated_email_count"] == 1
+
+    @respx.mock
+    async def test_auth_failure_sets_error(self):
+        respx.get("https://api.dehashed.com/search").mock(
+            return_value=httpx.Response(401)
+        )
+        entity = Entity(type=EntityType.PHONE_NUMBER, value=VALID_PHONE)
+        result = await self.transform.execute(
+            entity, {"DEHASHED_EMAIL": "me@x.com", "DEHASHED_API_KEY": "bad"}
+        )
+        assert result.error is not None
+        assert not result.entities

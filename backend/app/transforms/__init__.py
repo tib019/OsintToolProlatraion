@@ -4,6 +4,7 @@ from app.transforms.phone.platform_checker import PlatformRegistrationTransform
 from app.transforms.phone.cnam_lookup import CNAMLookupTransform
 from app.transforms.phone.leak_check import LeakCheckTransform
 from app.transforms.phone.social_linker import SocialProfileLinkerTransform
+from app.transforms.phone.email_correlation import PhoneEmailCorrelationTransform
 from app.transforms.general.username_search import UsernameSearchTransform
 from app.transforms.general.email_osint import EmailOSINTTransform
 from app.transforms.general.ip_domain_intel import IPDomainIntelTransform
@@ -16,6 +17,7 @@ for cls in [
     CNAMLookupTransform,
     LeakCheckTransform,
     SocialProfileLinkerTransform,
+    PhoneEmailCorrelationTransform,
     UsernameSearchTransform,
     EmailOSINTTransform,
     IPDomainIntelTransform,

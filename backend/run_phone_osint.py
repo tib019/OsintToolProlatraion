@@ -21,6 +21,7 @@ from app.transforms.phone.platform_checker import PlatformRegistrationTransform
 from app.transforms.phone.social_linker import SocialProfileLinkerTransform
 from app.transforms.phone.cnam_lookup import CNAMLookupTransform
 from app.transforms.phone.leak_check import LeakCheckTransform
+from app.transforms.phone.email_correlation import PhoneEmailCorrelationTransform
 
 # API-Keys aus der Umgebung (optional). Ohne Keys laufen die
 # Transforms mit reduzierter Funktionalität.
@@ -30,6 +31,8 @@ API_KEYS = {
     "OPENCNAM_AUTH_TOKEN": os.getenv("OPENCNAM_AUTH_TOKEN", ""),
     "HIBP_API_KEY": os.getenv("HIBP_API_KEY", ""),
     "TELEGRAM_BOT_TOKEN": os.getenv("TELEGRAM_BOT_TOKEN", ""),
+    "DEHASHED_EMAIL": os.getenv("DEHASHED_EMAIL", ""),
+    "DEHASHED_API_KEY": os.getenv("DEHASHED_API_KEY", ""),
 }
 
 TRANSFORMS = [
@@ -38,6 +41,7 @@ TRANSFORMS = [
     SocialProfileLinkerTransform(),
     CNAMLookupTransform(),
     LeakCheckTransform(),
+    PhoneEmailCorrelationTransform(),
 ]
 
 
